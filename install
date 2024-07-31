@@ -1,63 +1,64 @@
 #!/bin/bash
- 
+
 # Move to home directory
 cd "$HOME" || exit
- 
+
 # Update and upgrade packages
 sudo apt update && sudo apt upgrade -y
- 
+
 # Install Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
- 
+
 # Check Docker Compose version
 docker compose version
- 
+
 # Move back to root directory
-cd ..
- 
+cd /
+
 # Create Docker Directory and functions to install services
-mkdir -p docker
- 
+mkdir -p /docker
+
 install_overseerr() {
     mkdir -p /docker/overseerr && cd /docker/overseerr/
     curl -fsSL https://pastebin.com/raw/AMJ9n8AS -o docker-compose.yml
     docker compose up -d
 }
- 
+
 install_jackett_flaresolverr() {
     mkdir -p /docker/jackett && cd /docker/jackett/
     curl -fsSL https://pastebin.com/raw/sZ3XbiFE -o docker-compose.yml
     docker compose up -d
- 
+
     # Additional setup for Flaresolverr
     mkdir -p /docker/flaresolverr && cd /docker/flaresolverr
     sudo curl -fsSL https://raw.githubusercontent.com/FlareSolverr/FlareSolverr/master/docker-compose.yml -o docker-compose.yml
     sudo docker compose up -d
 }
- 
+
 # Prompt for Overseerr installation
 read -p "Do you want to install Overseerr? (y/n): " overseerr_choice
 if [ "$overseerr_choice" = "y" ]; then
     install_overseerr
 fi
- 
+
 # Prompt for Jackett and Flaresolverr installation
 read -p "Do you want to install Jackett and Flaresolverr? (y/n): " jackett_flaresolverr_choice
 if [ "$jackett_flaresolverr_choice" = "y" ]; then
     install_jackett_flaresolverr
 fi
- 
+
 # Always install pd_zurg
 sudo mkdir -p /docker/pd_zurg/{config,log,cache,RD,mnt} && cd /docker/pd_zurg/
 sudo curl -fsSL https://raw.githubusercontent.com/I-am-PUID-0/pd_zurg/master/docker-compose.yml -o docker-compose.yml
- 
+
 # Modify pd_zurg Docker Compose file
 sudo sed -i 's|/pd_zurg/|/docker/pd_zurg/|g' docker-compose.yml
 sudo curl -fsSL https://raw.githubusercontent.com/I-am-PUID-0/pd_zurg/master/update_docker_compose.sh -o update_docker_compose.sh && sudo chmod +x update_docker_compose.sh
- 
+
 # Move back to home directory
 cd "$HOME" || exit
- 
+
 # Display completion message
 echo "Installation complete. Docker and chosen containers have been installed."
+ 
